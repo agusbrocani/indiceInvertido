@@ -66,3 +66,13 @@ for (let indiceAlerta = 0; indiceAlerta < cantidadDeAlertas; indiceAlerta++) {
 for (const key in indiceInvertido) {
     console.log(indiceInvertido[key]);
 }
+
+const setPalabras = new Set<string>(["carro", "auto", "bicicleta", "auto"]);    // RESPETAN ORDEN DE INSERCIÓN, NO ALFABETICO O NUMERICO
+console.log(setPalabras);   // output: Set(3) { 'carro', 'auto', 'bicicleta' }
+
+// si tengo new Set<number>([1,2,4,0]) => output: 1,2,4,0 RESPETA ORDEN DE INSERCIÓN
+// Como los indices en mi caso siempre van a ser ascendentes, no voy a tener este problema y en vez de tener intersecciones entre KV de N*M van a ser de N + M siendo N ce primer array y M ce segundo array
+
+const setKV = new Set<Record<string, Set<number>>>();   // ESTO ES IDEAL, tengo claves únicas y me aseguro que a cada clave, tener INDICES ÚNICOS asociados.
+console.log(setKV);
+
