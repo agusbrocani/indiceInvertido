@@ -98,22 +98,28 @@ console.log(setPalabras);   // output: Set(3) { 'carro', 'auto', 'bicicleta' }
     Otro \b al final → asegura que la palabra termine bien.
 */
 
+// PASO 0: contar con un ARRAY DE REGISTROS
 const alertas: Alerta[] = [
   { id: 0, descripcion: "Auto rojo detenido", fechaYHora: new Date() },
   { id: 1, descripcion: "Camión blanco", fechaYHora: new Date() },
   { id: 2, descripcion: "Patente AB100XX involucrada detenido en arbol", fechaYHora: new Date() }
 ];
-const cadenaIngresadaPorElUsuario: string = "Auto rojo modelo 2023 patente AB100XX detenido";
+// const cadenaIngresadaPorElUsuario: string = "Auto rojo modelo 2023 patente AB100XX detenido";
+const cadenaIngresadaPorElUsuario: string = "Patente AB100XX involucrada detenido en arbol";
 
 const obtenerPalabras = (cadena: string): string[] => {
   return cadena.match(/\b[\wáéíóúÁÉÍÓÚñÑüÜ]+(?:\.\d+)?\b/g) ?? [];  // ?? [] es el operador de nullish coalescing => Si el resultado de .match(...) es null o undefined, en su lugar devuelve []
 };
 
+// PASO 1: inicializar INDICE INVERTIDO => acá se va a almacenar cada palabra como key y como value va a tener un SET que contiene TODO INDICE del array de REGISTROS donde figure esa palabra
 const mapIndice: Map<string, Set<number>> = new Map<string, Set<number>>();
+// PASO 2: convertir cadena ingresada en array de palabras.
 const palabrasIngresadasEnElBuscador: string[] = obtenerPalabras(cadenaIngresadaPorElUsuario);
 for (let palabra of palabrasIngresadasEnElBuscador) { 
     let indiceAlerta: number = 0;
     palabra = palabra.toLowerCase();  // IMPORTANTE: estandarizar las key pasandolas a minuscula
+    
+    // PASO 3: matchear palabra ingresada con palabra en CAMPO seleccionado para busqueda
     for (const alerta of alertas) {
         const descripcionNormalizada = alerta.descripcion.toLowerCase();    // NORMALIZO campo verificar => si está la palabra, lo indexo.
         if (descripcionNormalizada.includes(palabra)) { // SI el CAMPO CONTIENE palabra ingresada por el USUARIO.
@@ -127,5 +133,27 @@ for (let palabra of palabrasIngresadasEnElBuscador) {
     }
 }
 
-console.log(mapIndice);
+// PASO 4: RECUPERAR REGISTROS REALES QUE VE EL USUARIO.
+// BUSQUEDA EXACTA => es una ESTRATEGIA de busqueda.
+function interseccionTotal(mapIndice: Map<string, Set<number>>): Set<number> {
+  const sets = [...mapIndice.values()];
+  if (sets.length === 0) return new Set();
+
+  const resultado = new Set(sets[0]);
+  for (let i = 1; i < sets.length; i++) {
+    for (const valor of [...resultado]) {
+      if (!sets[i].has(valor)) {
+        resultado.delete(valor);
+      }
+    }
+  }
+  return resultado;
+}
+const indicesComunes: Set<number> = interseccionTotal(mapIndice);
+
+// PASO 5: Mostrar resultados de busqueda.
+console.log("RESULTADOS DE LA BUSQUEDA:");
+for (const indice of indicesComunes) {
+    console.log(alertas[indice]);
+}
 
