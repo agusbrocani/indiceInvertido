@@ -3,6 +3,14 @@ type Alerta = {
     descripcion: string,
     fechaYHora: Date,
     patente: string
+    campoRandom?: {
+        id: number,
+        descripcion: string,
+        campoRandom: {
+            id: number,
+            descripcion: string
+        }
+    }
 };
 
 const obtenerPalabras = (cadena: string): string[] => {
@@ -16,7 +24,16 @@ const normalizar = (cadena: string) => {
 const alertas: Alerta[] = [
     { id: 0, descripcion: "Auto rojo detenido", fechaYHora: new Date(), patente: "AB100XX"},
     { id: 1, descripcion: "Camion blanco", fechaYHora: new Date(), patente: "AB100XX"},
-    { id: 2, descripcion: "Patente AB100XX involucrada detenido en arbol camión blanco", fechaYHora: new Date(), patente: "AB100XX" }
+    { id: 2, descripcion: "Patente AB100XX involucrada detenido en arbol camión blanco", fechaYHora: new Date(), patente: "AB100XX"
+        ,campoRandom: {
+            id: 1,
+            descripcion: "des",
+            campoRandom: {
+                id: 1,
+                descripcion: ""
+            }
+        }
+    }
 ];
 const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX";
 
@@ -45,8 +62,8 @@ function construirIndiceInvertido<T extends Record<string, unknown>>(coleccion: 
     return indiceInvertido;
 }
 
-function definirIndicesResultadoConInterseccionTotal(mapIndice: Map<string, Set<number>>): Set<number> {
-    const sets: Set<number>[] = [...mapIndice.values()];
+function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string, Set<number>>): Set<number> {
+    const sets: Set<number>[] = [...indiceInvertido.values()];
     if (0 === sets.length) {
         return new Set();
     }
