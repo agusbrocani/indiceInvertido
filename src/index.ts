@@ -24,7 +24,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
             for (const campo in registro) {
                 const contenido: string = normalizar(String(registro[campo]));
                 if (contenido.includes(palabraIngresadasEnElBuscador)) {
-                    agregarIndiceInvertido(indiceInvertido, campo, indiceEnColeccion);
+                    agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
                 }
             }
             indiceEnColeccion++;
@@ -90,7 +90,7 @@ const alertas: Alerta[] = [
         }
     },
     {
-        id: 3, descripcion: "", fechaYHora: new Date(), patente: ""
+        id: 3, descripcion: "camión blanco AB100XX", fechaYHora: new Date(), patente: ""
         , campoRandom: {
             id: 1,
             descripcion: "des",
