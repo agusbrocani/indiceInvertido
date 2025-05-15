@@ -2,9 +2,16 @@ const obtenerPalabras = (cadena: string): string[] => {
     return cadena.match(/\b[\wáéíóúÁÉÍÓÚñÑüÜ]+(?:\.\d+)?\b/g) ?? [];
 };
 
-const normalizar = (cadena: string) => {
+const normalizar = (cadena: string): string => {
     return cadena.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 };
+
+function agregarIndiceInvertido(indiceInvertido: Map<string, Set<number>>, clave: string, valor: number): void {
+    if (!indiceInvertido.has(clave)) {
+        indiceInvertido.set(clave, new Set<number>());
+    }
+    indiceInvertido.get(clave)!.add(valor);
+}
 
 function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
     const palabrasIngresadasEnElBuscador: string[] = obtenerPalabras(cadenaIngresadaEnBuscador);
@@ -15,13 +22,9 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
         let indiceEnColeccion: number = 0;
         for (const registro of coleccion) {
             for (const campo in registro) {
-                const valor: string = normalizar(String(registro[campo]));
-
-                if (valor.includes(palabraIngresadasEnElBuscador)) {
-                    if (!indiceInvertido.has(palabraIngresadasEnElBuscador)) {
-                        indiceInvertido.set(palabraIngresadasEnElBuscador, new Set<number>());
-                    }
-                    indiceInvertido.get(palabraIngresadasEnElBuscador)!.add(indiceEnColeccion);
+                const contenido: string = normalizar(String(registro[campo]));
+                if (contenido.includes(palabraIngresadasEnElBuscador)) {
+                    agregarIndiceInvertido(indiceInvertido, campo, indiceEnColeccion);
                 }
             }
             indiceEnColeccion++;
@@ -76,13 +79,24 @@ const alertas: Alerta[] = [
     { id: 0, descripcion: "Auto rojo detenido", fechaYHora: new Date(), patente: "AB100XX" },
     { id: 1, descripcion: "Camion blanco", fechaYHora: new Date(), patente: "AB100XX" },
     {
-        id: 2, descripcion: "Patente AB100XX involucrada detenido en arbol camión blanco", fechaYHora: new Date(), patente: "AB100XX"
+        id: 2, descripcion: "", fechaYHora: new Date(), patente: "AB100XX"
         , campoRandom: {
             id: 1,
             descripcion: "des",
             campoRandom: {
                 id: 1,
-                descripcion: ""
+                descripcion: "camión blanco AB100XX"
+            }
+        }
+    },
+    {
+        id: 3, descripcion: "", fechaYHora: new Date(), patente: ""
+        , campoRandom: {
+            id: 1,
+            descripcion: "des",
+            campoRandom: {
+                id: 1,
+                descripcion: "camión blanco AB100XX"
             }
         }
     }
