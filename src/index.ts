@@ -17,6 +17,18 @@ function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string)
     return normalizar(contenido).includes(normalizar(clave));
 }
 
+function verificarExistencia(campo: unknown, clave: string): boolean {
+    if ('object' !== typeof campo) {
+        return verificarExistenciaDeClaveEnContenido(String(campo), clave);
+    }
+
+    for (const claveCampo in campo) {
+        verificarExistencia(claveCampo, clave);
+    }
+    
+    return false;
+}
+
 function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
     const palabrasIngresadasEnElBuscador: string[] = obtenerPalabras(cadenaIngresadaEnBuscador);
     const indiceInvertido: Map<string, Set<number>> = new Map<string, Set<number>>();
@@ -25,7 +37,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
         let indiceEnColeccion: number = 0;
         for (const registro of coleccion) {
             for (const campo in registro) {
-                if (verificarExistenciaDeClaveEnContenido(String(registro[campo]), palabraIngresadasEnElBuscador)) {
+                if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
                     agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
                 }
             }
