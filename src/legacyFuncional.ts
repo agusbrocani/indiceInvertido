@@ -1,12 +1,43 @@
+type Alerta = {
+    id: number,
+    descripcion: string,
+    fechaYHora: Date,
+    patente: string
+    campoRandom?: {
+        id: number,
+        descripcion: string,
+        campoRandom: {
+            id: number,
+            descripcion: string
+        }
+    }
+};
+
 const obtenerPalabras = (cadena: string): string[] => {
     return cadena.match(/\b[\wáéíóúÁÉÍÓÚñÑüÜ]+(?:\.\d+)?\b/g) ?? [];
 };
 
 const normalizar = (cadena: string) => {
-    return cadena.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return cadena.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 };
 
-function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
+const alertas: Alerta[] = [
+    { id: 0, descripcion: "Auto rojo detenido", fechaYHora: new Date(), patente: "AB100XX"},
+    { id: 1, descripcion: "Camion blanco", fechaYHora: new Date(), patente: "AB100XX"},
+    { id: 2, descripcion: "Patente AB100XX involucrada detenido en arbol camión blanco", fechaYHora: new Date(), patente: "AB100XX"
+        ,campoRandom: {
+            id: 1,
+            descripcion: "des",
+            campoRandom: {
+                id: 1,
+                descripcion: ""
+            }
+        }
+    }
+];
+const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX";
+
+function construirIndiceInvertido<T extends Record<string, unknown>>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
     const palabrasIngresadasEnElBuscador: string[] = obtenerPalabras(cadenaIngresadaEnBuscador);
     const indiceInvertido: Map<string, Set<number>> = new Map<string, Set<number>>();
 
@@ -32,7 +63,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
 }
 
 function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string, Set<number>>): Set<number> {
-    const sets: Set<number>[] = Array.from(indiceInvertido.values());
+    const sets: Set<number>[] = [...indiceInvertido.values()];
     if (0 === sets.length) {
         return new Set();
     }
@@ -40,7 +71,7 @@ function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string
     const resultado: Set<number> = new Set(sets[0]);
     const cantidadDeSets: number = sets.length;
     for (let i = 1; i < cantidadDeSets; i++) {
-        for (const valor of Array.from(resultado)) {
+        for (const valor of [...resultado]) {
             if (!sets[i].has(valor)) {
                 resultado.delete(valor);
             }
@@ -48,45 +79,9 @@ function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string
     }
     return resultado;
 }
-export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string): T[] {
-    const indicesComunes: Set<number> = definirIndicesResultadoConInterseccionTotal(construirIndiceInvertido(coleccion, cadenaABuscar));
-    const resultado: T[] = [];
-    for (const indice of Array.from(indicesComunes)) {
-        resultado.push(coleccion[indice]);
-    }
-    return resultado;
+const indicesComunes: Set<number> = definirIndicesResultadoConInterseccionTotal(construirIndiceInvertido(alertas, cadenaIngresadaEnBuscador));
+
+console.log("RESULTADOS DE LA BUSQUEDA:");
+for (const indice of indicesComunes) {
+    console.log(alertas[indice]);
 }
-
-type Alerta = {
-    id: number,
-    descripcion: string,
-    fechaYHora: Date,
-    patente: string
-    campoRandom?: {
-        id: number,
-        descripcion: string,
-        campoRandom: {
-            id: number,
-            descripcion: string
-        }
-    }
-};
-
-const alertas: Alerta[] = [
-    { id: 0, descripcion: "Auto rojo detenido", fechaYHora: new Date(), patente: "AB100XX" },
-    { id: 1, descripcion: "Camion blanco", fechaYHora: new Date(), patente: "AB100XX" },
-    {
-        id: 2, descripcion: "Patente AB100XX involucrada detenido en arbol camión blanco", fechaYHora: new Date(), patente: "AB100XX"
-        , campoRandom: {
-            id: 1,
-            descripcion: "des",
-            campoRandom: {
-                id: 1,
-                descripcion: ""
-            }
-        }
-    }
-];
-const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX";
-
-console.log(buscar(alertas, cadenaIngresadaEnBuscador));
