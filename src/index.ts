@@ -14,7 +14,7 @@ function agregarIndiceInvertido(indiceInvertido: Map<string, Set<number>>, clave
 }
 
 function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string): boolean {
-    return contenido.includes(clave);
+    return normalizar(contenido).includes(normalizar(clave));
 }
 
 function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
@@ -22,12 +22,10 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
     const indiceInvertido: Map<string, Set<number>> = new Map<string, Set<number>>();
 
     for (let palabraIngresadasEnElBuscador of palabrasIngresadasEnElBuscador) {
-        palabraIngresadasEnElBuscador = normalizar(palabraIngresadasEnElBuscador);
         let indiceEnColeccion: number = 0;
         for (const registro of coleccion) {
             for (const campo in registro) {
-                const contenido: string = normalizar(String(registro[campo]));
-                if (verificarExistenciaDeClaveEnContenido(contenido, palabraIngresadasEnElBuscador)) {
+                if (verificarExistenciaDeClaveEnContenido(String(registro[campo]), palabraIngresadasEnElBuscador)) {
                     agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
                 }
             }
