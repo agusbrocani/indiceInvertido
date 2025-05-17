@@ -17,37 +17,13 @@ function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string)
     return normalizar(contenido).includes(normalizar(clave));
 }
 
-function verificarExistencia(campo: unknown, clave: string): boolean {
-    if (campo === null || campo === undefined) return false;
-
-    if (typeof campo === 'string' || typeof campo === 'number' || typeof campo === 'boolean') {
-        return verificarExistenciaDeClaveEnContenido(String(campo), clave);
-    }
-
-    if (Array.isArray(campo)) {
-        for (const item of campo) {
-            if (verificarExistencia(item, clave)) return true;
-        }
-        return false;
-    }
-
-    if (typeof campo === 'object') {
-        for (const valor of Object.values(campo)) {
-            if (verificarExistencia(valor, clave)) return true;
-        }
-        return false;
-    }
-
-    return false;
-}
-
 function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>> , registro: T, palabraIngresadasEnElBuscador: string, indiceEnColeccion: number) {
     for (const campo in registro) {
         const valor: unknown = registro[campo];
         if ('object'=== typeof valor && null !== valor) {
             agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabraIngresadasEnElBuscador, indiceEnColeccion);
         } else {
-            if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
+            if (verificarExistenciaDeClaveEnContenido(String(registro[campo]), palabraIngresadasEnElBuscador)) {
                 agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
                 return;
             }
