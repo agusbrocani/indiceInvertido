@@ -41,16 +41,11 @@ function verificarExistencia(campo: unknown, clave: string): boolean {
     return false;
 }
 
-function fun<T extends object>(indiceInvertido: Map<string, Set<number>> , registro: T, palabraIngresadasEnElBuscador: string, indiceEnColeccion: number) {
+function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>> , registro: T, palabraIngresadasEnElBuscador: string, indiceEnColeccion: number) {
     for (const campo in registro) {
-        const valor = registro[campo as keyof T];
-        // if ('object' !== typeof registro[campo]) {
-        //     if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
-        //             agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
-        //             return;
-        //     }
-        if (typeof valor === 'object' && valor !== null) {
-            fun(indiceInvertido, valor, palabraIngresadasEnElBuscador, indiceEnColeccion);
+        const valor: unknown = registro[campo];
+        if ('object'=== typeof valor && null !== valor) {
+            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabraIngresadasEnElBuscador, indiceEnColeccion);
         } else {
             if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
                 agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
@@ -58,7 +53,6 @@ function fun<T extends object>(indiceInvertido: Map<string, Set<number>> , regis
             }
         }
     }
-    return;
 }
 
 function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
@@ -68,7 +62,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
     for (let palabraIngresadasEnElBuscador of palabrasIngresadasEnElBuscador) {
         let indiceEnColeccion: number = 0;
         for (const registro of coleccion) {
-            fun(indiceInvertido, registro, palabraIngresadasEnElBuscador, indiceEnColeccion);
+            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, registro, palabraIngresadasEnElBuscador, indiceEnColeccion);
             indiceEnColeccion++;
         }
     }
@@ -145,4 +139,5 @@ const alertas: Alerta[] = [
 ];
 const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX NARANJA";
 
+// buscar(alertas, cadenaIngresadaEnBuscador)
 console.log(buscar(alertas, cadenaIngresadaEnBuscador));
