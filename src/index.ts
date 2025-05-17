@@ -72,12 +72,12 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
 
 function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string, Set<number>>): Set<number> {
     const sets: Set<number>[] = Array.from(indiceInvertido.values());
-    if (0 === sets.length) {
+    const cantidadDeSets: number = sets.length;
+    if (0 === cantidadDeSets) {
         return new Set();
     }
 
     const resultado: Set<number> = new Set(sets[0]);
-    const cantidadDeSets: number = sets.length;
     for (let i = 1; i < cantidadDeSets; i++) {
         for (const valor of Array.from(resultado)) {
             if (!sets[i].has(valor)) {
