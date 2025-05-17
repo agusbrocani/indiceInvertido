@@ -64,11 +64,11 @@ function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string
     return resultado;
 }
 export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string): T[] {
+    const resultado: T[] = [];
     if ("" === cadenaABuscar.trim()) {
-        return [];
+        return resultado;
     }
     const indicesComunes: Set<number> = definirIndicesResultadoPorPalabraEncontrada(construirIndiceInvertido(coleccion, cadenaABuscar));
-    const resultado: T[] = [];
     for (const indice of Array.from(indicesComunes)) {
         resultado.push(coleccion[indice]);
     }
