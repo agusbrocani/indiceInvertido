@@ -17,28 +17,26 @@ function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string)
     return normalizar(contenido).includes(normalizar(clave));
 }
 
-function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>> , registro: T, palabraIngresadasEnElBuscador: string, indiceEnColeccion: number) {
+function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>>, registro: T, palabraClave: string, indiceEnColeccion: number) {
     for (const campo in registro) {
         const valor: unknown = registro[campo];
-        if ('object'=== typeof valor && null !== valor) {
-            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabraIngresadasEnElBuscador, indiceEnColeccion);
-        } else {
-            if (verificarExistenciaDeClaveEnContenido(String(registro[campo]), palabraIngresadasEnElBuscador)) {
-                agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
-                return;
-            }
+        if ('object' === typeof valor && null !== valor) {
+            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabraClave, indiceEnColeccion);
+        } else if (verificarExistenciaDeClaveEnContenido(String(valor), palabraClave)) {
+            agregarIndiceInvertido(indiceInvertido, palabraClave, indiceEnColeccion);
+            return;
         }
     }
 }
 
-function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
-    const palabrasIngresadasEnElBuscador: string[] = obtenerPalabras(cadenaIngresadaEnBuscador);
+function construirIndiceInvertido<T extends object>(coleccion: T[], cadena: string): Map<string, Set<number>> {
+    const palabras: string[] = obtenerPalabras(cadena);
     const indiceInvertido: Map<string, Set<number>> = new Map<string, Set<number>>();
 
-    for (let palabraIngresadasEnElBuscador of palabrasIngresadasEnElBuscador) {
+    for (const palabra of palabras) {
         let indiceEnColeccion: number = 0;
         for (const registro of coleccion) {
-            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, registro, palabraIngresadasEnElBuscador, indiceEnColeccion);
+            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, registro, palabra, indiceEnColeccion);
             indiceEnColeccion++;
         }
     }
@@ -46,7 +44,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
     return indiceInvertido;
 }
 
-function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string, Set<number>>): Set<number> {
+function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string, Set<number>>): Set<number> {
     const sets: Set<number>[] = Array.from(indiceInvertido.values());
     const cantidadDeSets: number = sets.length;
     if (0 === cantidadDeSets) {
@@ -64,7 +62,7 @@ function definirIndicesResultadoConInterseccionTotal(indiceInvertido: Map<string
     return resultado;
 }
 export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string): T[] {
-    const indicesComunes: Set<number> = definirIndicesResultadoConInterseccionTotal(construirIndiceInvertido(coleccion, cadenaABuscar));
+    const indicesComunes: Set<number> = definirIndicesResultadoPorPalabraEncontrada(construirIndiceInvertido(coleccion, cadenaABuscar));
     const resultado: T[] = [];
     for (const indice of Array.from(indicesComunes)) {
         resultado.push(coleccion[indice]);
@@ -108,12 +106,12 @@ const alertas: Alerta[] = [
             descripcion: "des",
             campoRandom: {
                 id: 1,
-                descripcion: "camión blanco AB100XX"
+                descripcion: "camión blanco AB101XX"
             }
         }
     }
 ];
-const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX NARANJA";
+const cadenaIngresadaEnBuscador: string = "camión blanco AB101XX";
 
 // buscar(alertas, cadenaIngresadaEnBuscador)
 console.log(buscar(alertas, cadenaIngresadaEnBuscador));
