@@ -64,6 +64,9 @@ function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string
     return resultado;
 }
 export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string): T[] {
+    if ("" === cadenaABuscar.trim()) {
+        return [];
+    }
     const indicesComunes: Set<number> = definirIndicesResultadoPorPalabraEncontrada(construirIndiceInvertido(coleccion, cadenaABuscar));
     const resultado: T[] = [];
     for (const indice of Array.from(indicesComunes)) {
@@ -91,7 +94,7 @@ const alertas: Alerta[] = [
     { id: 0, descripcion: "Auto rojo detenido", fechaYHora: new Date(), patente: "AB100XX" },
     { id: 1, descripcion: "Camion blanco", fechaYHora: new Date(), patente: "AB100XX" },
     {
-        id: 2, descripcion: "", fechaYHora: new Date(), patente: "AB100XX"
+        id: 2, descripcion: " ", fechaYHora: new Date(), patente: "AB100XX"
         , campoRandom: {
             id: 1,
             descripcion: "des",
@@ -102,7 +105,7 @@ const alertas: Alerta[] = [
         }
     },
     {
-        id: 3, descripcion: "camión", fechaYHora: new Date(), patente: ""
+        id: 3, descripcion: "camión", fechaYHora: new Date(), patente: " "
         , campoRandom: {
             id: 1,
             descripcion: "des",
@@ -113,7 +116,7 @@ const alertas: Alerta[] = [
         }
     }
 ];
-const cadenaIngresadaEnBuscador: string = "camión blanco AB101XX";
+const cadenaIngresadaEnBuscador: string = "";
 
 // buscar(alertas, cadenaIngresadaEnBuscador)
 console.log(buscar(alertas, cadenaIngresadaEnBuscador));
