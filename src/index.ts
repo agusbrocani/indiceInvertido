@@ -18,15 +18,47 @@ function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string)
 }
 
 function verificarExistencia(campo: unknown, clave: string): boolean {
-    if ('object' !== typeof campo) {
+    if (campo === null || campo === undefined) return false;
+
+    if (typeof campo === 'string' || typeof campo === 'number' || typeof campo === 'boolean') {
         return verificarExistenciaDeClaveEnContenido(String(campo), clave);
     }
 
-    for (const claveCampo in campo) {
-        verificarExistencia(claveCampo, clave);
+    if (Array.isArray(campo)) {
+        for (const item of campo) {
+            if (verificarExistencia(item, clave)) return true;
+        }
+        return false;
     }
-    
+
+    if (typeof campo === 'object') {
+        for (const valor of Object.values(campo)) {
+            if (verificarExistencia(valor, clave)) return true;
+        }
+        return false;
+    }
+
     return false;
+}
+
+function fun<T extends object>(indiceInvertido: Map<string, Set<number>> , registro: T, palabraIngresadasEnElBuscador: string, indiceEnColeccion: number) {
+    for (const campo in registro) {
+        const valor = registro[campo as keyof T];
+        // if ('object' !== typeof registro[campo]) {
+        //     if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
+        //             agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
+        //             return;
+        //     }
+        if (typeof valor === 'object' && valor !== null) {
+            fun(indiceInvertido, valor, palabraIngresadasEnElBuscador, indiceEnColeccion);
+        } else {
+            if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
+                agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
+                return;
+            }
+        }
+    }
+    return;
 }
 
 function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngresadaEnBuscador: string): Map<string, Set<number>> {
@@ -36,11 +68,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadenaIngres
     for (let palabraIngresadasEnElBuscador of palabrasIngresadasEnElBuscador) {
         let indiceEnColeccion: number = 0;
         for (const registro of coleccion) {
-            for (const campo in registro) {
-                if (verificarExistencia(registro[campo], palabraIngresadasEnElBuscador)) {
-                    agregarIndiceInvertido(indiceInvertido, palabraIngresadasEnElBuscador, indiceEnColeccion);
-                }
-            }
+            fun(indiceInvertido, registro, palabraIngresadasEnElBuscador, indiceEnColeccion);
             indiceEnColeccion++;
         }
     }
@@ -99,12 +127,12 @@ const alertas: Alerta[] = [
             descripcion: "des",
             campoRandom: {
                 id: 1,
-                descripcion: "camión blanco AB100XX"
+                descripcion: "camión blanco AB100XX NARANJA"
             }
         }
     },
     {
-        id: 3, descripcion: "camión blanco AB100XX", fechaYHora: new Date(), patente: ""
+        id: 3, descripcion: "camión", fechaYHora: new Date(), patente: ""
         , campoRandom: {
             id: 1,
             descripcion: "des",
@@ -115,6 +143,6 @@ const alertas: Alerta[] = [
         }
     }
 ];
-const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX";
+const cadenaIngresadaEnBuscador: string = "camión blanco AB100XX NARANJA";
 
 console.log(buscar(alertas, cadenaIngresadaEnBuscador));
