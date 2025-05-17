@@ -17,14 +17,18 @@ function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string)
     return normalizar(contenido).includes(normalizar(clave));
 }
 
-function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>>, registro: T, palabraClave: string, indiceEnColeccion: number) {
+function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>>, registro: T, palabrasClave: string[], indiceEnColeccion: number) {
     for (const campo in registro) {
         const valor: unknown = registro[campo];
         if ('object' === typeof valor && null !== valor) {
-            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabraClave, indiceEnColeccion);
-        } else if (verificarExistenciaDeClaveEnContenido(String(valor), palabraClave)) {
-            agregarIndiceInvertido(indiceInvertido, palabraClave, indiceEnColeccion);
-            return;
+            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabrasClave, indiceEnColeccion);
+        } else {
+            for (const palabraClave of palabrasClave) {
+                if (verificarExistenciaDeClaveEnContenido(String(valor), palabraClave)) {
+                    agregarIndiceInvertido(indiceInvertido, palabraClave, indiceEnColeccion);
+                    return;
+                }
+            }
         }
     }
 }
@@ -33,12 +37,10 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadena: stri
     const palabras: string[] = obtenerPalabras(cadena);
     const indiceInvertido: Map<string, Set<number>> = new Map<string, Set<number>>();
 
-    for (const palabra of palabras) {
-        let indiceEnColeccion: number = 0;
-        for (const registro of coleccion) {
-            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, registro, palabra, indiceEnColeccion);
-            indiceEnColeccion++;
-        }
+    let indiceEnColeccion: number = 0;
+    for (const registro of coleccion) {
+        agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, registro, palabras, indiceEnColeccion);
+        indiceEnColeccion++;
     }
 
     return indiceInvertido;
