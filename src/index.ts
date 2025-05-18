@@ -21,7 +21,7 @@ function agregarIndiceAMapaSiPalabraClaveExisteEnRegistro<T extends object>(indi
     for (const campo in registro) {
         const valor: unknown = registro[campo];
         if ('object' === typeof valor && null !== valor) {
-            agregarIndiceAMapaSiPalabraClaveExisteEnRegistro(indiceInvertido, valor, palabrasClave, indiceEnColeccion, cantidadDePalabrasClaveEncontradas);
+            cantidadDePalabrasClaveEncontradas = agregarIndiceAMapaSiPalabraClaveExisteEnRegistro(indiceInvertido, valor, palabrasClave, indiceEnColeccion, cantidadDePalabrasClaveEncontradas);
         } else {
             for (const palabraClave of palabrasClave) {
                 if (verificarExistenciaDeClaveEnContenido(String(valor), palabraClave)) {
@@ -44,7 +44,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadena: stri
     let indiceEnColeccion: number = 0;
     for (const registro of coleccion) {
         let cantidadDePalabrasClaveEncontradas: number = 0;
-        cantidadDePalabrasClaveEncontradas = agregarIndiceAMapaSiPalabraClaveExisteEnRegistro(indiceInvertido, registro, palabras, indiceEnColeccion, cantidadDePalabrasClaveEncontradas);
+        agregarIndiceAMapaSiPalabraClaveExisteEnRegistro(indiceInvertido, registro, palabras, indiceEnColeccion, cantidadDePalabrasClaveEncontradas);
         indiceEnColeccion++;
     }
 
@@ -70,7 +70,7 @@ function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string
 }
 export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string): T[] {
     const resultado: T[] = [];
-    if ("" === cadenaABuscar.trim()) {
+    if ('' === cadenaABuscar.trim()) {
         return resultado;
     }
     const indicesComunes: Set<number> = definirIndicesResultadoPorPalabraEncontrada(construirIndiceInvertido(coleccion, cadenaABuscar));
