@@ -17,19 +17,24 @@ function verificarExistenciaDeClaveEnContenido(contenido: string, clave: string)
     return normalizar(contenido).includes(normalizar(clave));
 }
 
-function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>>, registro: T, palabrasClave: string[], indiceEnColeccion: number) {
+function agregarIndiceAMapaSiPalabraClaveExisteEnRegistro<T extends object>(indiceInvertido: Map<string, Set<number>>, registro: T, palabrasClave: string[], indiceEnColeccion: number, cantidadDePalabrasClaveEncontradas: number): number {
     for (const campo in registro) {
         const valor: unknown = registro[campo];
         if ('object' === typeof valor && null !== valor) {
-            agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, valor, palabrasClave, indiceEnColeccion);
+            agregarIndiceAMapaSiPalabraClaveExisteEnRegistro(indiceInvertido, valor, palabrasClave, indiceEnColeccion, cantidadDePalabrasClaveEncontradas);
         } else {
             for (const palabraClave of palabrasClave) {
                 if (verificarExistenciaDeClaveEnContenido(String(valor), palabraClave)) {
                     agregarIndiceInvertido(indiceInvertido, palabraClave, indiceEnColeccion);
+                    cantidadDePalabrasClaveEncontradas++;
+                }
+                if (cantidadDePalabrasClaveEncontradas === palabrasClave.length) {
+                    return cantidadDePalabrasClaveEncontradas;
                 }
             }
         }
     }
+    return cantidadDePalabrasClaveEncontradas;
 }
 
 function construirIndiceInvertido<T extends object>(coleccion: T[], cadena: string): Map<string, Set<number>> {
@@ -38,7 +43,8 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadena: stri
 
     let indiceEnColeccion: number = 0;
     for (const registro of coleccion) {
-        agregarIndiceAMapaSiPalabraExisteEnRegistro(indiceInvertido, registro, palabras, indiceEnColeccion);
+        let cantidadDePalabrasClaveEncontradas: number = 0;
+        cantidadDePalabrasClaveEncontradas = agregarIndiceAMapaSiPalabraClaveExisteEnRegistro(indiceInvertido, registro, palabras, indiceEnColeccion, cantidadDePalabrasClaveEncontradas);
         indiceEnColeccion++;
     }
 
@@ -115,7 +121,7 @@ const alertas: Alerta[] = [
         }
     }
 ];
-const cadenaIngresadaEnBuscador: string = "";
+const cadenaIngresadaEnBuscador: string = "AB101XX";
 
 // buscar(alertas, cadenaIngresadaEnBuscador)
 console.log(buscar(alertas, cadenaIngresadaEnBuscador));
