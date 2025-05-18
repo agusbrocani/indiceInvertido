@@ -26,7 +26,6 @@ function agregarIndiceAMapaSiPalabraExisteEnRegistro<T extends object>(indiceInv
             for (const palabraClave of palabrasClave) {
                 if (verificarExistenciaDeClaveEnContenido(String(valor), palabraClave)) {
                     agregarIndiceInvertido(indiceInvertido, palabraClave, indiceEnColeccion);
-                    return;
                 }
             }
         }
