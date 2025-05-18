@@ -51,7 +51,7 @@ function construirIndiceInvertido<T extends object>(coleccion: T[], cadena: stri
     return indiceInvertido;
 }
 
-function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string, Set<number>>): Set<number> {
+export function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string, Set<number>>): Set<number> {
     const sets: Set<number>[] = Array.from(indiceInvertido.values());
     const cantidadDeSets: number = sets.length;
     if (0 === cantidadDeSets) {
@@ -68,12 +68,14 @@ function definirIndicesResultadoPorPalabraEncontrada(indiceInvertido: Map<string
     }
     return resultado;
 }
-export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string): T[] {
+
+type DefinirIndices = (indiceInvertido: Map<string, Set<number>>) => Set<number>;
+export function buscar<T extends object>(coleccion: T[], cadenaABuscar: string, estrategiaParaDefinirIndices: DefinirIndices): T[] {
     const resultado: T[] = [];
     if ('' === cadenaABuscar.trim()) {
         return resultado;
     }
-    const indicesComunes: Set<number> = definirIndicesResultadoPorPalabraEncontrada(construirIndiceInvertido(coleccion, cadenaABuscar));
+    const indicesComunes: Set<number> = estrategiaParaDefinirIndices(construirIndiceInvertido(coleccion, cadenaABuscar));
     for (const indice of Array.from(indicesComunes)) {
         resultado.push(coleccion[indice]);
     }
@@ -124,4 +126,4 @@ const alertas: Alerta[] = [
 const cadenaIngresadaEnBuscador: string = "AB101XX";
 
 // buscar(alertas, cadenaIngresadaEnBuscador)
-console.log(buscar(alertas, cadenaIngresadaEnBuscador));
+console.log(buscar(alertas, cadenaIngresadaEnBuscador, definirIndicesResultadoPorPalabraEncontrada));
